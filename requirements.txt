@@ -3,3 +3,4 @@ address-parser
 nose
 sphinx
 phonetics
+phonenumbers

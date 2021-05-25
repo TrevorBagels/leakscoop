@@ -13,6 +13,7 @@ Options: use this to set the default options for fields
 	remove_spaces:			removes spaces (false)
 	hashed:					used to tell if a value is hashed (false)
 	multi:					set this to true if the field you're indexing will be a list instead of a single value. for instance, if someone has multiple phone numbers stored in an array, you'd set this to true. (false)
+	phoneformat:			just throw in a bunch of x's and you'll be fine. (default: None)
 	
 
 

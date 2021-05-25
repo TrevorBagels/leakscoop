@@ -20,7 +20,7 @@
 			"city": {"key": "CITY"},
 			"state": {"key": "STATE"},
 			"zipcode": {"key": "ZIP_CODE"},
-			"phone": {"keylist": ["PHONE_NUM", "PHONE"]},
+			"phone": {"keylist": ["PHONE_NUM", "PHONE"], "formatphone": "(xxx) xxx-xxxx"},
 			"dobyear": {"key": "DOB"}
 		}
 	},
@@ -45,7 +45,6 @@
 			"city": {"key": "CITY"},
 			"state": {"key": "STATE"},
 			"zipcode": {"key": "ZIP_CODE"},
-			"phone": {"keylist": ["PHONE_NUM", "PHONE"]},
 			"dobyear": {"key": "DOB"}
 		}
 	},
@@ -110,7 +109,7 @@
 		{
 			"firstname": {"key": "FIRST_NAME"},
 			"lastname": {"key": "LAST_NAME"},
-			"phone": {"key": "MOBILE_NUMBER", "exclude_symbols": true},
+			"phone": {"key": "MOBILE_NUMBER", "formatphone": "xxxxxxxxxx"},
 			"dob": {"key": "DATE_OF_BIRTH"},
 			"password": {"keylist": ["PASSWORD", "SECOND_PASSWORD", "THIRD_PASSWORD"], "hashed": true},
 			"ssn": {"key": "SOCIAL_SECURITY_NUMBER"},
@@ -118,6 +117,23 @@
 			"vrn": {"key": "VRN", "multi": true},
 			"address": {"key": "ADDRESSLINE_1", "formatstr":"{buildingnumber} {streetname} {streettype} {streetdirection}"},
 			"zipcode": {"key": "ZIPCODE"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "USABoatOwners",
+		"Description": "Some boat owners or something, came from raidforums",
+		"Options": {
+			"upper": true
+		},
+		"Fields": {
+			"firstname": {"key": "FNAME"},
+			"lastname": {"key": "LNAME"},
+			"middlename": {"key": "MNAME"},
+			"address": {"key": "ADDRESS", "formatstr": "{buildingnumber} {streetdirection} {streetname}", "textsearch": true},
+			"city": {"key": "CITY"},
+			"state": {"key": "STATE"},
+			"zipcode": {"key": "ZIP"}
 		}
 	}
 

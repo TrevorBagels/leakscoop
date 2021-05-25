@@ -9,12 +9,14 @@ class FieldOptions(Prodict):
 	upper:				bool
 	lower:				bool
 	title:				bool
-	space_to_underscore:	bool
+	space_to_underscore:bool
 	formatstr:			str
+	formatphone:		str
 	exclude_symbols:	bool
 	remove_spaces:		bool
 	hashed:				bool
 	multi:				bool
+	textsearch:			bool
 	
 	def init(self):
 		self.upper 				= False
@@ -25,7 +27,9 @@ class FieldOptions(Prodict):
 		self.remove_spaces		= False
 		self.hashed				= False
 		self.multi				= False
-		self.format				= ""
+		self.formatstr			= None
+		self.formatphone		= None
+		self.textsearch			= False
 
 class Field(Prodict):
 	key:			str
@@ -35,17 +39,17 @@ class Field(Prodict):
 		self.options = FieldOptions()
 
 class Fields:
-	firstname:		Field
-	middlename:		Field
-	lastname:		Field
-	address:		Field
+	firstname:			Field
+	middlename:			Field
+	lastname:			Field
+	address:			Field
 
 	streetdirection:	Field
 	streettype:			Field
 	streetname:			Field
 	streettypelong:		Field
 	buildingnumber:		Field
-	zipcode:				Field
+	zipcode:			Field
 	city:				Field
 	state:				Field
 
@@ -75,8 +79,9 @@ import pymongo
 
 class Main:
 	def __init__(self):
-		self.CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
+		self.limit = 3
 
+		self.CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
 
 		self.collections:list[Collection] = [Collection.from_dict(x) for x in utils.load_json("./collections.json")]
 		defOptions = FieldOptions()
@@ -92,10 +97,14 @@ class Main:
 		
 		
 	def address_lookup(self, building, direction, streetname, streettype, city, state, zipcode):
+		from streetaddress.abbrevs import USA_ABBREVS
+		abrevs = {v: k for k, v in USA_ABBREVS.items()}
 		query = dict(zip(
-			["buildingnumber", "streetdirection", "streetname", "streettype", "city", "state", "zipcode"],
-			[building, direction, streetname, streettype, city, state, zipcode]
+			["buildingnumber", "streetdirection", "streetname", "streettype", "city", "state", "zipcode", "streettypelong"],
+			[building, direction, streetname, streettype, city, state, zipcode, abrevs[streettype]]
 		))
+		streetTypeLong = {"st": "Street", "ln": "lane"}
+		query["address"] = ""
 		self.lookup(query)
 
 	def name_lookup(self, first, middle, last):
@@ -103,6 +112,10 @@ class Main:
 		for x in query.copy():
 			if query[x] == "":
 				del query[x]
+		self.lookup(query)
+
+	def phone_lookup(self, number):
+		query = {"phone": number}
 		self.lookup(query)
 
 	def convert(self, value, options:FieldOptions, data:dict):
@@ -113,43 +126,83 @@ class Main:
 		if options.exclude_symbols:
 			for x in ["-", "(", ")", "+", "=", "|"]: value = str(value).replace(x, "")
 		if options.remove_spaces: value = str(value).replace(" ", "")
-
+		if options.formatphone != None:
+			newphone = ""
+			curr_index = 0
+			for x in options.formatphone:
+				if x == "x" and len(value)-1 >= curr_index:
+					x = value[curr_index]
+					curr_index += 1
+				newphone += str(x)
+			value = newphone
 		if options.formatstr != None:
 			value = options.formatstr
 			for k, x in data.items():
 				if type(x) == str:
 					value = value.replace("{" + k + "}", x)
+		if options.textsearch:
+			return {"$text": {"$search": value}}
 		return value
+
+
+	def db_exists(self, collection):
+		if self.CLIENT.get_database(collection.DB) == None:
+			print("Database does not exist!")
+			return False
+		elif collection.COLL not in self.CLIENT[collection.DB].collection_names():
+			print("Collection does not exist!")
+			return False
+		return True
+
+	def get_all_queries(self, q, qvariants):
+		#q = the parameters that WILL NOT change
+		#qvariants = k: value to search, v: keys that can be used
+		#example qvariants: 	{"john": ["FIRSTNAME", "ALIAS"]}
+		allq = []
+		for x in qvariants:
+			for k in qvariants[x]:
+				newq = q.copy()
+				newq[k] = x
+				if len(newq) > 0:
+					allq.append(newq)
+		if len(allq) == 0:
+			allq.append(q)
+		return allq
+			
 
 	def lookup(self, parameters):
 		for k, p in parameters.copy().items():
-			if p == None or p == "":
-				del parameters[k]
+			if k not in ["address"]:
+				if p == None or p == "":
+					del parameters[k]
 		results = []
 		for collection in self.collections:
 			print("Searching through", collection.Description)
+			qvariants = {} #key = the value we search for, value = the keys we can use
 			q = {}
 			for k, v in parameters.items():
 				if k in collection.Fields:
 					converted = self.convert(v, collection.Fields[k].options, parameters)
+					if type(converted) == dict:
+						q = converted
+						break
 					if converted != "":
-						q[collection.Fields[k].key] = converted
-			if len(q) == 0:
-				continue
-			print("Query:", q)
-
-			if self.CLIENT.get_database(collection.DB) == None:
-				print("Database does not exist!")
-				continue
-			elif collection.COLL not in self.CLIENT[collection.DB].collection_names():
-				print("Collection does not exist!")
-				continue
-			result = self.CLIENT[collection.DB][collection.COLL].find_one(q)
-			if result != None:
-				print("Found something! ")
-				results.append({"DB": collection.DB, "COLL": collection.COLL, "DESC": collection.Description, "data": result})
+						if collection.Fields[k].key != None:
+							q[collection.Fields[k].key] = converted
+						elif collection.Fields[k].keys != None:
+							qvariants[v] = collection.Fields[k].keys.copy()
+			queries = self.get_all_queries(q, qvariants)
+			for query in queries:
+				if len(query) == 0: continue
+				print("Query:", query)
+				if self.db_exists(collection) == False: continue
+				qresults = list(self.CLIENT[collection.DB][collection.COLL].find(query).limit(self.limit))
+				if len(qresults) > 0:
+					print("Found something! ")
+					results.append({"DB": collection.DB, "COLL": collection.COLL, "DESC": collection.Description, "query": query, "data": qresults})
 		
 		utils.save_json("lookup.json", results)
+		return results
 			
 
 	
