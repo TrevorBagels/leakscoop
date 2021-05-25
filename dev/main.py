@@ -1,7 +1,7 @@
 
 from threading import current_thread
 from typing import ForwardRef
-
+import datetime
 from pymongo.message import query
 from . import utils
 from .prodict import Prodict
@@ -75,7 +75,7 @@ class Collection(Prodict):
 	Fields:			dict[str, Field]
 
 
-import pymongo
+import pymongo, os
 
 
 class Main:
@@ -83,8 +83,23 @@ class Main:
 		self.limit = 3
 
 		self.CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
+		self.collections:list[Collection] = []
+		self.get_collection_config()
+		
+	def load_collection(self, x):
+		for fname, field in x["Fields"].items():
+			if type(field) == str:
+				x["Fields"][fname] = Field()
+				x["Fields"][fname].key = field
+				continue
+		return Collection.from_dict(x)
 
-		self.collections:list[Collection] = [Collection.from_dict(x) for x in utils.load_json("./collections.json")]
+	def get_collection_config(self):
+		for f in os.listdir("./collections"):
+			if f.endswith(".json"):
+				c = [self.load_collection(x) for x in utils.load_json(f"./collections/{f}")]
+				self.collections = self.collections + c
+		#set options and things
 		defOptions = FieldOptions()
 		for coll in self.collections:
 			for fname, field in coll.Fields.items():
@@ -95,7 +110,6 @@ class Main:
 					if o in field: #we've assigned this option to this field
 						newoptions[o] = field[o]
 				field.options = newoptions
-		
 		
 	def address_lookup(self, building, direction, streetname, streettype, city, state, zipcode):
 		from streetaddress.abbrevs import USA_ABBREVS
@@ -181,6 +195,8 @@ class Main:
 			
 
 	def lookup(self, parameters):
+		parameters_original = parameters.copy()
+		starttime = datetime.datetime.now()
 		for k, p in parameters.copy().items():
 			if k not in ["address"]:
 				if p == None or p == "":
@@ -210,8 +226,9 @@ class Main:
 				if len(qresults) > 0:
 					print("Found something! ")
 					results.append({"DB": collection.DB, "COLL": collection.COLL, "DESC": collection.Description, "query": query, "data": qresults})
-		
-		utils.save_json("lookup.json", results)
+		timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H:%M:%S")
+		finalresults = {"started": starttime.strftime("%m-%d-%y_%H:%M:%S"), "ended": timestamp, "parameters": parameters_original, "results": results}
+		utils.save_json(f"results/{timestamp}_results.json", finalresults)
 		return results
 			
 

@@ -1,0 +1,55 @@
+[
+	{
+		"DB": "Leaks",
+		"COLL": "Comcast",
+		"Description": "Small comcast leak",
+		"Options":
+		{
+			"upper": true
+		},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"middlename": {"key": "MIDDLE_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"address": {"key": "ADDRESS", "formatstr": "{buildingnumber} {streetdirection} {streetname} {streettypelong} {city} {state} {zipcode}"},
+			"email": {"key": "EMAIL"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "Parkmobile",
+		"Description": "Parkmobile 2021 Breach",
+		"Options": {},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"phone": {"key": "MOBILE_NUMBER", "formatphone": "xxxxxxxxxx"},
+			"dob": {"key": "DATE_OF_BIRTH"},
+			"password": {"keylist": ["PASSWORD", "SECOND_PASSWORD", "THIRD_PASSWORD"], "hashed": true},
+			"ssn": {"key": "SOCIAL_SECURITY_NUMBER"},
+			"email": {"key": "EMAIL"},
+			"vrn": {"key": "VRN", "multi": true},
+			"address": {"key": "ADDRESSLINE_1", "formatstr":"{buildingnumber} {streetname} {streettype} {streetdirection}"},
+			"zipcode": {"key": "ZIPCODE"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "USABoatOwners",
+		"Description": "Some boat owners or something, came from raidforums",
+		"Options": {
+			"upper": true
+		},
+		"Fields": {
+			"firstname": {"key": "FNAME"},
+			"lastname": {"key": "LNAME"},
+			"middlename": {"key": "MNAME"},
+			"address": {"key": "ADDRESS", "formatstr": "{buildingnumber} {streetdirection} {streetname}", "textsearch": true},
+			"city": {"key": "CITY"},
+			"state": {"key": "STATE"},
+			"zipcode": {"key": "ZIP"}
+		}
+	}
+]

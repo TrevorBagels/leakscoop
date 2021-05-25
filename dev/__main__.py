@@ -1,9 +1,14 @@
 from . import main
-import argparse, sys
+import argparse, sys, os
 
 import time
 
 m = main.Main()
+
+for p in ["./results", "./collections"]:
+	if os.path.exists(p) == False:
+		os.mkdir(p)
+
 
 
 if __name__ == "__main__":

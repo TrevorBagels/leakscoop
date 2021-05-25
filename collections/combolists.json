@@ -1,0 +1,13 @@
+[
+	{
+		"DB": "Leaks",
+		"COLL": "ComcastPasswords",
+		"Description": "Comcast password leak",
+		"Options": {},
+		"Fields":
+		{
+			"email": {"key": "EMAIL"},
+			"password": {"key": "PASSWORD"}
+		}
+	}
+]

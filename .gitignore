@@ -3,4 +3,5 @@
 **.env
 .DS_Store
 .vscode
-lookup.json
+results/*
+collections/uncommon.json
