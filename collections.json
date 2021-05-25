@@ -1,0 +1,124 @@
+[
+	{
+		"DB": "Voter",
+		"COLL": "Oregon",
+		"Description": "Oregon voter data 2018",
+		"Options":
+		{
+			"upper": true
+		},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"middlename": {"key": "MIDDLE_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"address": {"key": "RES_ADDRESS_1"},
+			"streetdirection": {"key": "PRE_DIRECTION"},
+			"streetname": {"key": "STREET_NAME"},
+			"streettype": {"key": "STREET_TYPE"},
+			"buildingnumber": {"key": "HOUSE_NUM"},
+			"city": {"key": "CITY"},
+			"state": {"key": "STATE"},
+			"zipcode": {"key": "ZIP_CODE"},
+			"phone": {"keylist": ["PHONE_NUM", "PHONE"]},
+			"dobyear": {"key": "DOB"}
+		}
+	},
+	{
+		"DB": "Voter",
+		"COLL": "OregonHistory",
+		"Description": "Oregon voter data history",
+		"Options":
+		{
+			"upper": true
+		},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"middlename": {"key": "MIDDLE_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"address": {"key": "RES_ADDRESS_1"},
+			"streetdirection": {"key": "PRE_DIRECTION"},
+			"streetname": {"key": "STREET_NAME"},
+			"streettype": {"key": "STREET_TYPE"},
+			"buildingnumber": {"key": "HOUSE_NUM"},
+			"city": {"key": "CITY"},
+			"state": {"key": "STATE"},
+			"zipcode": {"key": "ZIP_CODE"},
+			"phone": {"keylist": ["PHONE_NUM", "PHONE"]},
+			"dobyear": {"key": "DOB"}
+		}
+	},
+	{
+		"DB": "Voter",
+		"COLL": "Washington",
+		"Description": "Washington voter data 2018",
+		"Options":
+		{
+			"upper": true
+		},
+		"Fields":
+		{
+			"firstname": {"key": "FName"},
+			"middlename": {"key": "MName"},
+			"lastname": {"key": "LName"},
+			"streetdirection": {"key": "RegStPostDirection"},
+			"streetname": {"key": "RegStName"},
+			"streettype": {"key": "RegStType"},
+			"city": {"key": "RegCity"},
+			"state": {"key": "RegState"},
+			"zipcode": {"key": "RegZipCode"},
+			"mail": {"keylist": ["Mail1", "Mail2", "Mail3", "Mail4"]},
+			"dob": {"key": "Birthdate"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "Comcast",
+		"Description": "Small comcast leak",
+		"Options":
+		{
+			"upper": true
+		},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"middlename": {"key": "MIDDLE_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"address": {"key": "ADDRESS", "formatstr": "{buildingnumber} {streetdirection} {streetname} {streettypelong} {city} {state} {zipcode}"},
+			"email": {"key": "EMAIL"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "ComcastPasswords",
+		"Description": "Comcast password leak",
+		"Options": {},
+		"Fields":
+		{
+			"email": {"key": "EMAIL"},
+			"password": {"key": "PASSWORD"}
+		}
+	},
+	{
+		"DB": "Leaks",
+		"COLL": "Parkmobile",
+		"Description": "Parkmobile 2021 Breach",
+		"Options": {},
+		"Fields":
+		{
+			"firstname": {"key": "FIRST_NAME"},
+			"lastname": {"key": "LAST_NAME"},
+			"phone": {"key": "MOBILE_NUMBER", "exclude_symbols": true},
+			"dob": {"key": "DATE_OF_BIRTH"},
+			"password": {"keylist": ["PASSWORD", "SECOND_PASSWORD", "THIRD_PASSWORD"], "hashed": true},
+			"ssn": {"key": "SOCIAL_SECURITY_NUMBER"},
+			"email": {"key": "EMAIL"},
+			"vrn": {"key": "VRN", "multi": true},
+			"address": {"key": "ADDRESSLINE_1", "formatstr":"{buildingnumber} {streetname} {streettype} {streetdirection}"},
+			"zipcode": {"key": "ZIPCODE"}
+		}
+	}
+
+
+]
