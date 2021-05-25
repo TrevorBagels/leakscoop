@@ -20,8 +20,9 @@ LName: "Doe"
 ```
 
 A simple program to iterate through all your collections and perform queries wouldn't work, because: 
-  a) the field names are different. Notice that in `leak1`, the first name field is `FIRST_NAME`, while in `leak2`, the first name field is named `FName`. 
-  b) the field values might be structured differently. In `leak1`, everything is captialized. In `leak2`, it's all title-case.
+
+ * the field names are different. Notice that in `leak1`, the first name field is `FIRST_NAME`, while in `leak2`, the first name field is named `FName`. 
+ * the field values might be structured differently. In `leak1`, everything is captialized. In `leak2`, it's all title-case.
 
 This program lets you write a configuration for each collection, specifying, in JSON, how to query each field. 
 
