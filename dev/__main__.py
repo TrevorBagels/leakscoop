@@ -1,29 +1,55 @@
 from . import main
 import argparse, sys
 
-
+import time
 
 m = main.Main()
 
 
 if __name__ == "__main__":
 	ap = argparse.ArgumentParser()
-	search_options = ["NAME", "ADDRESS"]
-	ap.add_argument("--search", default="NAME", help="What to search with. Options currently are: " + ", ".join(search_options))
+	search_options = ["NAME", "ADDRESS", "PHONE", "EMAIL", "VRN", "AUTO"]
+	ap.add_argument("--search", default="AUTO", help="What to search with. Options currently are: " + ", ".join(search_options))
 	ap.add_argument("--firstname", default=None, help="First name. Don't use this without also providing --lastname.")
 	ap.add_argument("--middlename", default=None, help="Middle name.")
 	ap.add_argument("--lastname", default=None, help="Last name.")
-	ap.add_argument("--phone", default=None, help="Phone number in the format of +xx (xxx) xxx xxxx")
+	ap.add_argument("--phone", default=None, help="Phone number.")
+	ap.add_argument("--email", default=None, help="Email address.")
+	ap.add_argument("--VRN", default=None, help="Vehicle registration number / license plate.")
+	ap.add_argument("--limit", default=2, help="How many documents to return per query. Default = 2")
 
 	ap.add_argument("--address", default=None, help="Address. ")
 	
 	args = ap.parse_args()
-
+	print()
+	m.limit = args.limit
 	if args.search.upper() not in search_options:
 		print("Invallid search mode. Select one of the following:",", ".join(search_options))
 		sys.exit()
+	
+
 
 	searchmode = args.search.upper()
+	if searchmode == "AUTO":
+		search_fields = {
+			"NAME": ["firstname", "middlename", "lastname"],
+			"ADDRESS": ["address"],
+			"PHONE": ["phone"],
+			"EMAIL": ["email"],
+			"VRN": ["VRN"]
+		}
+		mode = None
+		for k, v in args.__dict__.items():
+			if k == "search": continue
+			if v != None:
+				for k1, v1 in search_fields.items():
+					if k in v1:
+						mode = k1
+		if mode != None:
+			searchmode = mode.upper()
+
+
+	print("MODE:", searchmode)
 
 	if searchmode == "NAME":
 		m.name_lookup(args.firstname, args.middlename, args.lastname)
@@ -36,8 +62,16 @@ if __name__ == "__main__":
 	elif searchmode == "PHONE":
 		import phonenumbers
 		phone = args.phone
+		if "+" not in phone:
+			phone = "+1 " + phone 
 		parsed = phonenumbers.parse(phone)
-		parsed = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
+		parsed = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)[-10:]
+		print("PHONE:", parsed)
+		m.phone_lookup(parsed)
+	elif searchmode == "EMAIL":
+		m.email_lookup(args.email)
+	elif searchmode == "VRN":
+		m.plate_lookup(args.vrn)
 		
 		
 

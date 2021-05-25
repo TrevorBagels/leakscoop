@@ -1,4 +1,5 @@
 
+from threading import current_thread
 from typing import ForwardRef
 
 from pymongo.message import query
@@ -117,6 +118,12 @@ class Main:
 	def phone_lookup(self, number):
 		query = {"phone": number}
 		self.lookup(query)
+	def email_lookup(self, email):
+		query = {"email": email}
+		self.lookup(query)
+	def plate_lookup(self, vrn):
+		query = {"vrn": vrn}
+		self.lookup(query)
 
 	def convert(self, value, options:FieldOptions, data:dict):
 		if options.upper: value = str(value).upper()
@@ -127,14 +134,16 @@ class Main:
 			for x in ["-", "(", ")", "+", "=", "|"]: value = str(value).replace(x, "")
 		if options.remove_spaces: value = str(value).replace(" ", "")
 		if options.formatphone != None:
-			newphone = ""
+			newphone = []
+			currphone = list(value)
 			curr_index = 0
 			for x in options.formatphone:
-				if x == "x" and len(value)-1 >= curr_index:
-					x = value[curr_index]
-					curr_index += 1
-				newphone += str(x)
-			value = newphone
+				newphone.append(x)
+				if x == "x":
+					newphone[len(newphone)-1] = currphone[0]
+					currphone.pop(0)
+			value = "".join(newphone)
+		
 		if options.formatstr != None:
 			value = options.formatstr
 			for k, x in data.items():
@@ -146,6 +155,7 @@ class Main:
 
 
 	def db_exists(self, collection):
+		#return False #uncomment this line for testing (when you wanna just see the queries without actually interacting with the database)
 		if self.CLIENT.get_database(collection.DB) == None:
 			print("Database does not exist!")
 			return False
@@ -189,8 +199,8 @@ class Main:
 					if converted != "":
 						if collection.Fields[k].key != None:
 							q[collection.Fields[k].key] = converted
-						elif collection.Fields[k].keys != None:
-							qvariants[v] = collection.Fields[k].keys.copy()
+						elif collection.Fields[k].keylist != None:
+							qvariants[converted] = collection.Fields[k].keylist.copy()
 			queries = self.get_all_queries(q, qvariants)
 			for query in queries:
 				if len(query) == 0: continue
