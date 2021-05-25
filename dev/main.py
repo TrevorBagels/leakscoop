@@ -110,34 +110,6 @@ class Main:
 					if o in field: #we've assigned this option to this field
 						newoptions[o] = field[o]
 				field.options = newoptions
-		
-	def address_lookup(self, building, direction, streetname, streettype, city, state, zipcode):
-		from streetaddress.abbrevs import USA_ABBREVS
-		abrevs = {v: k for k, v in USA_ABBREVS.items()}
-		query = dict(zip(
-			["buildingnumber", "streetdirection", "streetname", "streettype", "city", "state", "zipcode", "streettypelong"],
-			[building, direction, streetname, streettype, city, state, zipcode, abrevs[streettype]]
-		))
-		streetTypeLong = {"st": "Street", "ln": "lane"}
-		query["address"] = ""
-		self.lookup(query)
-
-	def name_lookup(self, first, middle, last):
-		query = dict(zip(["firstname", "middlename", "lastname"], [first, middle, last]))
-		for x in query.copy():
-			if query[x] == "":
-				del query[x]
-		self.lookup(query)
-
-	def phone_lookup(self, number):
-		query = {"phone": number}
-		self.lookup(query)
-	def email_lookup(self, email):
-		query = {"email": email}
-		self.lookup(query)
-	def plate_lookup(self, vrn):
-		query = {"vrn": vrn}
-		self.lookup(query)
 
 	def convert(self, value, options:FieldOptions, data:dict):
 		if options.upper: value = str(value).upper()

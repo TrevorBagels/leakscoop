@@ -1,9 +1,9 @@
-from . import main
+from . import lookups
 import argparse, sys, os
 
 import time
 
-m = main.Main()
+m = lookups.Lookups()
 
 for p in ["./results", "./collections"]:
 	if os.path.exists(p) == False:
@@ -64,19 +64,13 @@ if __name__ == "__main__":
 		addy = adp.parse(args.address)
 		args = [addy.number.tnumber, addy.road.direction, addy.road.name, addy.road.suffix, addy.locality.city, addy.locality.state, addy.locality.zip]
 		m.address_lookup(*args)
-	elif searchmode == "PHONE":
-		import phonenumbers
-		phone = args.phone
-		if "+" not in phone:
-			phone = "+1 " + phone 
-		parsed = phonenumbers.parse(phone)
-		parsed = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)[-10:]
-		print("PHONE:", parsed)
+	elif searchmode == "PHONE":		
+		print("PHONE:", args.phone)
 		m.phone_lookup(parsed)
 	elif searchmode == "EMAIL":
 		m.email_lookup(args.email)
 	elif searchmode == "VRN":
-		m.plate_lookup(args.vrn)
+		m.plate_lookup(args.VRN)
 		
 		
 
