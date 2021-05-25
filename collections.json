@@ -62,6 +62,7 @@
 			"firstname": {"key": "FName"},
 			"middlename": {"key": "MName"},
 			"lastname": {"key": "LName"},
+			"buildingnumber": {"key": "RegStNum"},
 			"streetdirection": {"key": "RegStPostDirection"},
 			"streetname": {"key": "RegStName"},
 			"streettype": {"key": "RegStType"},

@@ -122,6 +122,9 @@ class Main:
 		return value
 
 	def lookup(self, parameters):
+		for k, p in parameters.copy().items():
+			if p == None or p == "":
+				del parameters[k]
 		results = []
 		for collection in self.collections:
 			print("Searching through", collection.Description)

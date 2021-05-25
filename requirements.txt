@@ -1,0 +1,5 @@
+pymongo
+address-parser
+nose
+sphinx
+phonetics
