@@ -202,7 +202,6 @@ class Main:
 		finalresults = {"started": starttime.strftime("%m-%d-%y_%H:%M:%S"), "ended": timestamp, "parameters": parameters_original, "results": results}
 		utils.save_json(f"results/{timestamp}_results.json", finalresults)
 		return results
-			
 
 	
 					
