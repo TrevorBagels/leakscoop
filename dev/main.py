@@ -198,6 +198,7 @@ class Main:
 				if len(qresults) > 0:
 					print("Found something! ")
 					results.append({"DB": collection.DB, "COLL": collection.COLL, "DESC": collection.Description, "query": query, "data": qresults})
+					utils.save_json(f"results/latest.json", qresults)
 		timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H:%M:%S")
 		finalresults = {"started": starttime.strftime("%m-%d-%y_%H:%M:%S"), "ended": timestamp, "parameters": parameters_original, "results": results}
 		utils.save_json(f"results/{timestamp}_results.json", finalresults)

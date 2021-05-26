@@ -65,8 +65,7 @@ if __name__ == "__main__":
 		args = [addy.number.tnumber, addy.road.direction, addy.road.name, addy.road.suffix, addy.locality.city, addy.locality.state, addy.locality.zip]
 		m.address_lookup(*args)
 	elif searchmode == "PHONE":		
-		print("PHONE:", args.phone)
-		m.phone_lookup(parsed)
+		m.phone_lookup(args.phone)
 	elif searchmode == "EMAIL":
 		m.email_lookup(args.email)
 	elif searchmode == "VRN":
