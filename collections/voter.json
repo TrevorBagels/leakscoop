@@ -7,6 +7,10 @@
 		{
 			"upper": true
 		},
+		"Filter":
+		{
+			"state": {"values": ["OR", "Oregon", null], "casesensitive": false, "logic": true}
+		},
 		"Fields":
 		{
 			"firstname": {"key": "FIRST_NAME"},
@@ -32,6 +36,10 @@
 		{
 			"upper": true
 		},
+		"Filter":
+		{
+			"state": {"values": ["OR", "Oregon", null], "casesensitive": false, "logic": true}
+		},
 		"Fields":
 		{
 			"firstname": {"key": "FIRST_NAME"},
@@ -56,6 +64,10 @@
 		{
 			"upper": true
 		},
+		"Filter":
+		{
+			"state": {"values": ["WA", "Washington", null], "casesensitive": false, "logic": true}
+		},
 		"Fields":
 		{
 			"firstname": {"key": "FName"},
@@ -79,6 +91,10 @@
 		"Options": 
 		{
 			"upper": true
+		},
+		"Filter":
+		{
+			"state": {"values": ["TX", "Texas", null], "casesensitive": false, "logic": true}
 		},
 		"Fields":
 		{

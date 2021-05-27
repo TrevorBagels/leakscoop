@@ -65,7 +65,15 @@ class Fields:
 	vrn:				Field
 	ssn:				Field
 	
+class Filter(Prodict):
+	value:			list[str]
+	casesensitive:	bool
+	logic:			bool
 
+	def init(self):
+		self.value = []
+		self.casesensitive = False
+		self.logic = True
 
 class Collection(Prodict):
 	DB:				str
@@ -73,6 +81,7 @@ class Collection(Prodict):
 	Description:	str
 	Options:		FieldOptions
 	Fields:			dict[str, Field]
+	Filter:		dict[str, Filter]
 
 
 import pymongo, os
@@ -81,17 +90,25 @@ import pymongo, os
 class Main:
 	def __init__(self):
 		self.limit = 3
-
 		self.CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
 		self.collections:list[Collection] = []
 		self.get_collection_config()
+		self.args:dict[str, str] = {}
 		
 	def load_collection(self, x):
+		if "Fields" not in x:
+			print(f"Collection has no fields!")
+		if "Filter" not in x:
+			x["Filter"] = {}
 		for fname, field in x["Fields"].items():
 			if type(field) == str:
 				x["Fields"][fname] = Field()
 				x["Fields"][fname].key = field
 				continue
+		for fname, filt in x["Filter"].items():
+			if "values" in filt:
+				filt["value"] = filt["values"]
+			del filt["values"]
 		return Collection.from_dict(x)
 
 	def get_collection_config(self):
@@ -150,6 +167,17 @@ class Main:
 			return False
 		return True
 
+	def can_use_collection(self, collection:Collection, parameters):
+		blocked = False
+		for k, f in collection.Filter.items():
+			if k not in self.args:
+				self.args[k] = None
+			value = self.args[k] in f.value
+			if (value == f.logic) == False:
+				blocked = True
+				break
+		return not blocked
+
 	def get_all_queries(self, q, qvariants):
 		#q = the parameters that WILL NOT change
 		#qvariants = k: value to search, v: keys that can be used
@@ -176,6 +204,9 @@ class Main:
 		results = []
 		for collection in self.collections:
 			print("Searching through", collection.Description)
+			if self.can_use_collection(collection, parameters) == False:
+				print("Skipping collection because of filters in place!")
+				continue
 			qvariants = {} #key = the value we search for, value = the keys we can use
 			q = {}
 			for k, v in parameters.items():

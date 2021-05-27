@@ -21,6 +21,10 @@
 		"COLL": "Parkmobile",
 		"Description": "Parkmobile 2021 Breach",
 		"Options": {},
+		"Filter":
+		{
+			"country": {"values": ["US", "USA", null]}
+		},
 		"Fields":
 		{
 			"firstname": {"key": "FIRST_NAME"},
@@ -41,6 +45,10 @@
 		"Description": "Some boat owners or something, came from raidforums",
 		"Options": {
 			"upper": true
+		},
+		"Filter":
+		{
+			"country": {"values": ["US", "USA", null]}
 		},
 		"Fields": {
 			"firstname": {"key": "FNAME"},

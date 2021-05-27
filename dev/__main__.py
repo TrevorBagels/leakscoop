@@ -1,3 +1,4 @@
+from . import utils
 from . import lookups
 import argparse, sys, os
 
@@ -22,11 +23,19 @@ if __name__ == "__main__":
 	ap.add_argument("--email", default=None, help="Email address.")
 	ap.add_argument("--VRN", default=None, help="Vehicle registration number / license plate.")
 	ap.add_argument("--limit", default=2, help="How many documents to return per query. Default = 2")
-
 	ap.add_argument("--address", default=None, help="Address. ")
-	
+	filternames = []
+	for c in m.collections:
+		for f in c.Filter:
+			if f not in filternames:
+				filternames.append(f)
+	for x in filternames:
+		ap.add_argument(f"--{x}", default=None, help="For additional filtering.")
+
+
+
 	args = ap.parse_args()
-	print()
+	m.args = args.__dict__
 	m.limit = args.limit
 	if args.search.upper() not in search_options:
 		print("Invallid search mode. Select one of the following:",", ".join(search_options))
