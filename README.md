@@ -28,7 +28,7 @@ This program lets you write a configuration for each collection, specifying, in 
 
 It's a work in progress, but so far, it works pretty well. It'll probably be easier to understand if you take a look at the config files under `./collections/`. Each JSON file under `./collections/` should be an array of objects. The program automatically processes all JSON files under that directory.
 
-Some more info for how the configurations work can be found in the wiki.
+Some more info for how the configurations work can be found in the [wiki](https://github.com/TrevorBagels/leakscoop/wiki).
 
 
 ## Example Usage:
