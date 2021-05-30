@@ -48,4 +48,4 @@ Adding a zipcode to the end, or a state/province might speed up the query (depen
 (information redacted for this person's privacy)
 
 ![image](https://user-images.githubusercontent.com/61929192/120115230-914c7080-c137-11eb-8530-430c2b211704.png)
-
+Configured fields will print to the console, while all the other fields in a result will be saved under `./results/`.
