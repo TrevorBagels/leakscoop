@@ -44,5 +44,8 @@ Find all records for someone with an address of "1234 NW Long St"
 
 Adding a zipcode to the end, or a state/province might speed up the query (depending on how you index your databases)
 
+## Screenshot
+(information redacted for this person's privacy)
 
+![image](https://user-images.githubusercontent.com/61929192/120115230-914c7080-c137-11eb-8530-430c2b211704.png)
 
