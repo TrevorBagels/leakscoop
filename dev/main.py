@@ -2,9 +2,11 @@
 from threading import current_thread
 from typing import ForwardRef
 import datetime
+import colorama
 from pymongo.message import query
 from . import utils
 from .prodict import Prodict
+import colorama
 
 class FieldOptions(Prodict):
 	upper:				bool
@@ -66,7 +68,7 @@ class Fields:
 	ssn:				Field
 	
 class Filter(Prodict):
-	value:			list[str]
+	value:			list
 	casesensitive:	bool
 	logic:			bool
 
@@ -94,10 +96,11 @@ class Main:
 		self.collections:list[Collection] = []
 		self.get_collection_config()
 		self.args:dict[str, str] = {}
+		self.lookuptype = "NAME"
 		
 	def load_collection(self, x):
 		if "Fields" not in x:
-			print(f"Collection has no fields!")
+			print(colorama.ansi.Fore.RED, f"Collection has no fields!")
 		if "Filter" not in x:
 			x["Filter"] = {}
 		for fname, field in x["Fields"].items():
@@ -160,10 +163,10 @@ class Main:
 	def db_exists(self, collection):
 		#return False #uncomment this line for testing (when you wanna just see the queries without actually interacting with the database)
 		if self.CLIENT.get_database(collection.DB) == None:
-			print("Database does not exist!")
+			print(colorama.ansi.Fore.RED, "Database does not exist!")
 			return False
 		elif collection.COLL not in self.CLIENT[collection.DB].collection_names():
-			print("Collection does not exist!")
+			print(colorama.ansi.Fore.RED, "Collection does not exist!")
 			return False
 		return True
 
@@ -203,9 +206,9 @@ class Main:
 					del parameters[k]
 		results = []
 		for collection in self.collections:
-			print("Searching through", collection.Description)
+			print(colorama.ansi.Fore.WHITE, "Searching through", colorama.ansi.Fore.LIGHTMAGENTA_EX, collection.Description)
 			if self.can_use_collection(collection, parameters) == False:
-				print("Skipping collection because of filters in place!")
+				print(colorama.ansi.Fore.WHITE, "Skipping collection because of filters in place!")
 				continue
 			qvariants = {} #key = the value we search for, value = the keys we can use
 			q = {}
@@ -223,17 +226,33 @@ class Main:
 			queries = self.get_all_queries(q, qvariants)
 			for query in queries:
 				if len(query) == 0: continue
-				print("Query:", query)
+				print(colorama.ansi.Fore.WHITE, "Query:", colorama.ansi.Fore.BLUE, query)
 				if self.db_exists(collection) == False: continue
 				qresults = list(self.CLIENT[collection.DB][collection.COLL].find(query).limit(self.limit))
 				if len(qresults) > 0:
-					print("Found something! ")
+					print(colorama.ansi.Fore.LIGHTCYAN_EX, "Found something! ")
+					for res in qresults:
+						self.print_result(collection, res, parameters_original)
 					results.append({"DB": collection.DB, "COLL": collection.COLL, "DESC": collection.Description, "query": query, "data": qresults})
 					utils.save_json(f"results/latest.json", qresults)
 		timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H:%M:%S")
 		finalresults = {"started": starttime.strftime("%m-%d-%y_%H:%M:%S"), "ended": timestamp, "parameters": parameters_original, "results": results}
 		utils.save_json(f"results/{timestamp}_results.json", finalresults)
 		return results
-
 	
-					
+	def table_line(self, stuff:list, spacing=25):
+		txt = ""
+		for x in stuff:
+			txt += x + (" " * (spacing-len(x)))
+		return txt
+
+
+	def print_result(self, collection:Collection, result, parameters):
+		for fn, f in collection.Fields.items():
+			if fn not in parameters or parameters[fn] not in ["", None]: #we don't know this parameter
+				keys = []
+				if f.key != None:keys.append(f.key)
+				elif f.keylist != None: keys = f.keylist
+				for key in keys:
+					if key != None and key in result and result[key] not in [None, ""]:
+						print(colorama.ansi.Fore.GREEN, self.table_line([fn, result[key], f"({key})"]))
