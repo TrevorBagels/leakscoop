@@ -1,10 +1,15 @@
 from . import utils
 from . import lookups
 import argparse, sys, os
-
+from . import prodict
 import time
 
-m = lookups.Lookups()
+class Config(prodict.Prodict):
+	clientpath:	str
+	limit:		int
+	def init(self):
+		self.clientpath = "mongodb://localhost:27017/"
+		self.limit = 2
 
 for p in ["./results", "./collections"]:
 	if os.path.exists(p) == False:
@@ -12,8 +17,20 @@ for p in ["./results", "./collections"]:
 
 
 
+
+
+
+
 if __name__ == "__main__":
+	m = lookups.Lookups()
+	config = Config.from_dict(utils.load_json("config.json"))
+	utils.save_json("config.json", config)
+
 	ap = argparse.ArgumentParser()
+	descs = {
+		"limit": "How many documents to return per query. Default = 2",
+		"clientpath": "Path to connect to the database. Default = mongodb://localhost:27017/"
+	}
 	search_options = ["NAME", "ADDRESS", "PHONE", "EMAIL", "VRN", "AUTO"]
 	ap.add_argument("--search", default="AUTO", help="What to search with. Options currently are: " + ", ".join(search_options))
 	ap.add_argument("--firstname", default=None, help="First name. Don't use this without also providing --lastname.")
@@ -22,8 +39,13 @@ if __name__ == "__main__":
 	ap.add_argument("--phone", default=None, help="Phone number.")
 	ap.add_argument("--email", default=None, help="Email address.")
 	ap.add_argument("--VRN", default=None, help="Vehicle registration number / license plate.")
-	ap.add_argument("--limit", default=2, help="How many documents to return per query. Default = 2")
 	ap.add_argument("--address", default=None, help="Address. ")
+
+	for x in config:
+		d = ""
+		if x in descs: d = descs[x]
+		ap.add_argument(f"--{x}", default=config[x], help=d)
+
 	filternames = []
 	for c in m.collections:
 		for f in c.Filter:
@@ -35,8 +57,11 @@ if __name__ == "__main__":
 
 
 	args = ap.parse_args()
+	
+	m.initialize_client(args.clientpath)
 	m.args = args.__dict__
-	m.limit = args.limit
+	m.limit = int(args.limit)
+	
 	if args.search.upper() not in search_options:
 		print("Invallid search mode. Select one of the following:",", ".join(search_options))
 		sys.exit()

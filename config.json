@@ -1,0 +1,4 @@
+{
+    "clientpath": "mongodb://localhost:27017/",
+    "limit": 2
+}

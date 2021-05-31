@@ -92,12 +92,14 @@ import pymongo, os
 class Main:
 	def __init__(self):
 		self.limit = 3
-		self.CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
 		self.collections:list[Collection] = []
 		self.get_collection_config()
 		self.args:dict[str, str] = {}
 		self.lookuptype = "NAME"
-		
+
+	def initialize_client(self, clientpath):
+		self.CLIENT = pymongo.MongoClient(clientpath)
+
 	def load_collection(self, x):
 		if "Fields" not in x:
 			print(colorama.ansi.Fore.RED, f"Collection has no fields!")
@@ -159,7 +161,6 @@ class Main:
 			return {"$text": {"$search": value}}
 		return value
 
-
 	def db_exists(self, collection):
 		#return False #uncomment this line for testing (when you wanna just see the queries without actually interacting with the database)
 		if self.CLIENT.get_database(collection.DB) == None:
@@ -170,7 +171,7 @@ class Main:
 			return False
 		return True
 
-	def can_use_collection(self, collection:Collection, parameters):
+	def can_use_collection(self, collection:Collection):
 		blocked = False
 		for k, f in collection.Filter.items():
 			if k not in self.args:
@@ -195,8 +196,7 @@ class Main:
 		if len(allq) == 0:
 			allq.append(q)
 		return allq
-			
-
+	
 	def lookup(self, parameters):
 		parameters_original = parameters.copy()
 		starttime = datetime.datetime.now()
@@ -207,7 +207,7 @@ class Main:
 		results = []
 		for collection in self.collections:
 			print(colorama.ansi.Fore.WHITE, "Searching through", colorama.ansi.Fore.LIGHTMAGENTA_EX, collection.Description)
-			if self.can_use_collection(collection, parameters) == False:
+			if self.can_use_collection(collection) == False:
 				print(colorama.ansi.Fore.WHITE, "Skipping collection because of filters in place!")
 				continue
 			qvariants = {} #key = the value we search for, value = the keys we can use
@@ -228,6 +228,8 @@ class Main:
 				if len(query) == 0: continue
 				print(colorama.ansi.Fore.WHITE, "Query:", colorama.ansi.Fore.BLUE, query)
 				if self.db_exists(collection) == False: continue
+				if self.is_query_efficient(collection, query) == False:
+					print(colorama.ansi.Fore.YELLOW, "This query might take a while. Consider indexing your data next time to speed up the process.")
 				qresults = list(self.CLIENT[collection.DB][collection.COLL].find(query).limit(self.limit))
 				if len(qresults) > 0:
 					print(colorama.ansi.Fore.LIGHTCYAN_EX, "Found something! ")
@@ -240,12 +242,24 @@ class Main:
 		utils.save_json(f"results/{timestamp}_results.json", finalresults)
 		return results
 	
+	def is_query_efficient(self, collection:Collection, q):
+		if self.db_exists(collection):
+			c = self.CLIENT[collection.DB][collection.COLL]
+			textsearch = False
+			indexes = c.index_information()
+			efficient = False
+			for k, i in indexes.items():
+				if i['key'][0][0] in q: efficient = True
+				if "_fts" in i['key'][0]:
+					textsearch = True
+			return textsearch or efficient
+		return False
+
 	def table_line(self, stuff:list, spacing=25):
 		txt = ""
 		for x in stuff:
 			txt += x + (" " * (spacing-len(x)))
 		return txt
-
 
 	def print_result(self, collection:Collection, result, parameters):
 		for fn, f in collection.Fields.items():
