@@ -28,7 +28,7 @@ This program lets you write a configuration for each collection, specifying, in 
 
 It's a work in progress, but so far, it works pretty well. It'll probably be easier to understand if you take a look at the config files under `./collections/`. Each JSON file under `./collections/` should be an array of objects. The program automatically processes all JSON files under that directory.
 
-Some more info for how the configurations work can be found in `notes.md`
+Some more info for how the configurations work can be found in the [wiki](https://github.com/TrevorBagels/leakscoop/wiki).
 
 
 ## Example Usage:
@@ -44,5 +44,8 @@ Find all records for someone with an address of "1234 NW Long St"
 
 Adding a zipcode to the end, or a state/province might speed up the query (depending on how you index your databases)
 
+## Screenshot
+(information redacted for this person's privacy)
 
-
+![image](https://user-images.githubusercontent.com/61929192/120115230-914c7080-c137-11eb-8530-430c2b211704.png)
+Configured fields will print to the console, while all the other fields in a result will be saved under `./results/`.
